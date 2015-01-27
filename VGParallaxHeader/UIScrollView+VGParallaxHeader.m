@@ -109,6 +109,17 @@ static void *VGParallaxHeaderObserverContext = &VGParallaxHeaderObserverContext;
         }
         // This is where the magic is happening
         self.parallaxHeader.containerView.frame = CGRectMake(0, self.contentOffset.y, CGRectGetWidth(self.frame), height);
+        
+        // For iCarousel
+        if ([self.parallaxHeader.contentView isKindOfClass:NSClassFromString(@"iCarousel")]) {
+            UIView *currentItemView = [self.parallaxHeader.contentView performSelector:NSSelectorFromString(@"currentItemView")];
+            currentItemView.layer.anchorPoint = CGPointMake(0.5, 0.5);
+            if (scaleProgress > 1.0f) {
+                self.parallaxHeader.contentView.transform = CGAffineTransformMakeScale(scaleProgress, scaleProgress);
+            } else {
+                self.parallaxHeader.contentView.transform = CGAffineTransformIdentity;
+            }
+        }
     }
 }
 
@@ -247,8 +258,9 @@ static void *VGParallaxHeaderObserverContext = &VGParallaxHeaderObserverContext;
         UIEdgeInsets edgeInsets = [[change valueForKey:@"new"] UIEdgeInsetsValue];
         
         // If scroll view we need to fix inset (TableView has parallax view in table view header)
-        self.originalTopInset = edgeInsets.top - ((!self.isInsideTableView) ? self.originalHeight : 0);
-        
+//        self.originalTopInset = edgeInsets.top - ((!self.isInsideTableView) ? self.originalHeight : 0);
+        self.originalTopInset = 0; // Note: Customized
+ 
         switch (self.mode) {
             case VGParallaxHeaderModeFill:
                 self.insetAwarePositionConstraint.constant = self.originalTopInset / 2;
